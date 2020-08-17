@@ -18,6 +18,10 @@ const getCliente = (request,response) => {
     Cliente.findByPk(request.params.id)
         .then((data) => {response.status(200).json(data)})
         .catch((err) => {response.status(500).json(err)})
+
+    // bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+    //     // result == true
+    // });
 }
 
 const postCliente = (request,response) => {
@@ -26,12 +30,19 @@ const postCliente = (request,response) => {
 
     const salt_rounds = 10;
 
-    const plain_pass = cliene.c_pass;
-    
-    Cliente.create(cliente)
-        .then((data) => {response.status(200).json(data)})
-        .catch((err) => {response.status(500).json(err)})
-        
+    bcrypt.hash(cliente.c_pass, salt_rounds, function(err, hash) {
+            if(hash){
+
+                cliente.c_pass = hash
+
+                Cliente.create(cliente)
+                .then((data) => {response.status(200).json(data)})
+                .catch((err) => {response.status(500).json(err)})
+            }else{
+                console.log(err)
+            }
+        },
+    );
 }
 
 const getPedido = (request, response) => {
