@@ -12,7 +12,7 @@ const port = 5000
 app.get('/api/v1/cliente/:id',db.getCliente)
 app.post('/api/v1/cliente',db.postCliente)
 
-app.get('/api/v1/pedido-cliente/:id',db.getPedido)
+app.get('/api/v1/pedido-cliente',db.getPedido)
 
 app.post('/api/v1/auth',db.postAuth)
 

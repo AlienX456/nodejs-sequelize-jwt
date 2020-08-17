@@ -17,6 +17,7 @@ const Producto = modelProducto(sequelize, DataTypes);
 const bcrypt = require('bcrypt');
 const { request } = require("http");
 const { response } = require("express");
+const { decode } = require("punycode");
 
 const getCliente = (request,response) => {
     
@@ -51,18 +52,37 @@ const postCliente = (request,response) => {
 
 const getPedido = (request, response) => {
 
-    Pedido.hasMany(RPedido,{ foreignKey: 'pk_idpedido' });
-    
-    Pedido.findAll(
-        {
-            where : {fk_idcliente: request.params.id},
-            include: [
-                {model: RPedido}
-            ]
-        }
-        )
-        .then((data) => {response.status(200).json(data)})
-        .catch((err) => {response.status(500).json(err)})
+    if (!request.headers.authorization){
+        response.status(403).send('No auth')
+    }else{
+
+        var token = request.headers.authorization.split(" ")[1];
+
+        jwt.verify(token, secret, function(err,decoded){
+            if (decoded){
+
+                Pedido.hasMany(RPedido,{ foreignKey: 'pk_idpedido' });
+
+                Pedido.findAll(
+                    {
+                        where : {fk_idcliente: decoded.pk_idcliente},
+                        include: [
+                            {model: RPedido}
+                        ]
+                    }
+                    )
+                    .then((data) => {response.status(200).json(data)})
+                    .catch((err) => {response.status(500).json(err)})
+
+            }else{
+
+                response.status(403).json(err)
+                
+            }
+
+        })
+
+    }
 }
 
 
