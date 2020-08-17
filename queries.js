@@ -6,6 +6,9 @@ const modelPedido= require('./models/pedido');
 const modelRPedido= require('./models/resumen_pedido');
 const modelProducto = require('./models/pedido');
 
+const jwt = require('jsonwebtoken')
+const secret = 'my-jwt-secret'
+
 const Cliente = modelCliente(sequelize, DataTypes);
 const Pedido = modelPedido(sequelize, DataTypes);
 const RPedido = modelRPedido(sequelize, DataTypes);
@@ -36,7 +39,9 @@ const postCliente = (request,response) => {
                 cliente.c_pass = hash
 
                 Cliente.create(cliente)
-                .then((data) => {response.status(200).json(data)})
+                .then(() => {
+                    response.status(500).send(jwt.sign({pk_idcliente: cliente.pk_idcliente},secret,{ expiresIn: 30 }))
+                })
                 .catch((err) => {response.status(500).json(err)})
             }else{
                 console.log(err)
