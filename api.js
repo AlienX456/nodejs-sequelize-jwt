@@ -14,6 +14,8 @@ app.post('/api/v1/cliente',db.postCliente)
 
 app.get('/api/v1/pedido-cliente/:id',db.getPedido)
 
+app.get('/api/v1/many-many/:id',db.getManyMany)
+
 //INIT API
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)

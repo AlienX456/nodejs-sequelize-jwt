@@ -11,6 +11,8 @@ const Pedido = modelPedido(sequelize, DataTypes);
 const RPedido = modelRPedido(sequelize, DataTypes);
 const Producto = modelProducto(sequelize, DataTypes);
 
+const bcrypt = require('bcrypt');
+
 const getCliente = (request,response) => {
     
     Cliente.findByPk(request.params.id)
@@ -21,6 +23,10 @@ const getCliente = (request,response) => {
 const postCliente = (request,response) => {
 
     const cliente = request.body
+
+    const salt_rounds = 10;
+
+    const plain_pass = cliene.c_pass;
     
     Cliente.create(cliente)
         .then((data) => {response.status(200).json(data)})
@@ -44,8 +50,33 @@ const getPedido = (request, response) => {
         .catch((err) => {response.status(500).json(err)})
 }
 
+const getManyMany = (request, response) => {
+
+    Pedido.belongsToMany(Producto, { through: RPedido});
+    Producto.belongsToMany(Pedido, { through: RPedido});
+
+    // Pedido.hasMany(RPedido,{ foreignKey: 'pk_idpedido' });
+    // RPedido.belongsTo(Pedido)
+
+    // Producto.hasMany(RPedido,{ foreignKey: 'pk_idproducto' });
+    // RPedido.belongsTo(Producto)
+
+    
+    Pedido.findAll(
+        {
+            where : {fk_idcliente: request.params.id},
+            include: [
+                {model: Producto}
+            ]
+        }
+        )
+        .then((data) => {response.status(200).json(data)})
+        .catch((err) => {response.status(500).json(err)})
+}
+
 module.exports = {
     getCliente,
     postCliente,
-    getPedido
+    getPedido,
+    getManyMany
 }
