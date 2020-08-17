@@ -15,6 +15,8 @@ const RPedido = modelRPedido(sequelize, DataTypes);
 const Producto = modelProducto(sequelize, DataTypes);
 
 const bcrypt = require('bcrypt');
+const { request } = require("http");
+const { response } = require("express");
 
 const getCliente = (request,response) => {
     
@@ -22,9 +24,6 @@ const getCliente = (request,response) => {
         .then((data) => {response.status(200).json(data)})
         .catch((err) => {response.status(500).json(err)})
 
-    // bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
-    //     // result == true
-    // });
 }
 
 const postCliente = (request,response) => {
@@ -66,6 +65,41 @@ const getPedido = (request, response) => {
         .catch((err) => {response.status(500).json(err)})
 }
 
+
+const postAuth = (request,response) => {
+    const cliente = request.body
+
+    Cliente.findByPk(cliente.pk_idcliente)
+        .then((data) => {
+            bcrypt.compare(cliente.c_pass, data.c_pass, function(err, result) {
+                if (result){
+                    response.status(200).send(jwt.sign({pk_idcliente: cliente.pk_idcliente},secret,{ expiresIn: 30 }))
+                }else{
+                    response.status(403).send(err)
+                }
+            });
+
+        })
+        .catch((err) => {response.status(500).json(err)})
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const getManyMany = (request, response) => {
 
     Pedido.belongsToMany(Producto, { through: RPedido});
@@ -94,5 +128,6 @@ module.exports = {
     getCliente,
     postCliente,
     getPedido,
+    postAuth,
     getManyMany
 }

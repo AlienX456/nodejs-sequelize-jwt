@@ -14,6 +14,8 @@ app.post('/api/v1/cliente',db.postCliente)
 
 app.get('/api/v1/pedido-cliente/:id',db.getPedido)
 
+app.post('/api/v1/auth',db.postAuth)
+
 app.get('/api/v1/many-many/:id',db.getManyMany)
 
 //INIT API
